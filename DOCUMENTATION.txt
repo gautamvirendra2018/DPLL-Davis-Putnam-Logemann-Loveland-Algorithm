@@ -1,0 +1,93 @@
+Implementation of DPLL based SAT-solver
+---------------------------------------
+Virendra Kumar Gautam
+------------------------------
+
+INTRODUCTION
+------------
+
+The SAT problem is important both theoretical and practical points of view.
+In complexity theory it was the first problem prooved to be NP-cmplete.
+The SAT problem appears in a broad variety of application such as 
+model-checking, automated planning and scheduling, and diagnosis in 
+artificial intelligence. DPLL's modern implementations such as Chaff and 
+zChaff, GRASP or Minisat are in the first places of the competitions from 
+the last years.
+
+Another application that involves DPLL is satisfiability modula theories
+(SMT), which is a SAT problem in which propositional variables are 
+replaced with formulas of another mathematical theory.
+
+In this project, I have implemented a DPLL based SAT - solver 
+with some optimizations. The underlying algorithm is the following:
+
+INPUT: .cnf file
+OUTPUT: SATISFIABLE/UNSATISFIABLE
+DPLL(T):
+	1. AddClauses(cnf(e(phi)))
+	2. while(True) do:
+	3.		repeat
+	4.		while (BCP() = "Conflict") do
+	5.			backtrack-level = AnalyseConflict()
+	6.			if (backtrack-level < 0) then
+	7.				return "UNSATISFIABLE"
+	8.			else Backtrack(backtrack-level)
+	9.			<t, res> = Deduction(Th(alpha))
+	10.			AddClauses(e(t))
+	11.		until t = True
+	12.		if alpha is a full assignment then
+	13.			return SATISFIABLE
+	14.		DECIDE()
+
+
+BASIC IMPLEMENTATION
+--------------------
+I have used Anaconda - python version 3.7.6 for this project. I have implemented
+many functions, out of them three functions 'main function' calls readFile 
+and dpll_dfs which also calls the BCP function to resolve the BCP 
+conflicts.
+The readFile function takes input  in the DIMACS format and converts into 
+a list of clauses. The function, then, returns the list, total number of the 
+variables, and clauses.
+The dpll_dfs takes dictionary of the cnf formula and variables as parameters.
+which has BCP and largest_true_variable as the main helper functions. The BCP 
+function resloves the case of conflicts, while the largest_true_variable function 
+returns the variable which is used many times in the clauses. The dpll algorithm 
+actually is a backtracking algorithm. So, it uses the concept of the depth 
+first search.
+The algorithm runs by choosing a clause, then analysing the literals of 
+this clause. The algorithm assumes truth value to this literal, to 
+simplify the formula. For the complete analysis, the algorithm recursively 
+checks if the simplified formula is satisfiable or not.
+If this formula is satisfiable, then original formula is also satisfiable; 
+otherwise it recursively checks the formula with the opposite tru value. 
+
+We also have enhanced the backtracking behavior of the dpll algorithm  by the 
+wise use of the following rules at each step.
+
+1. Unit Propagation:
+--------------------
+The algorithm checks if the clause is a Unit clause, i.e. it contains only 
+a single unassigned literal, this clause can only be satisfied by 
+assigning the necessary truth value to make it true without any other choice.
+
+2. Pure Literal Elimination:
+----------------------------
+"If a propositional variable occurs with only one polarity in the formula,
+it is called pure. Pure literals can always be assigned in a way that 
+makes all clauses containing them true. Thus, these clauses do not 
+constrain the search anymore and can be deleted".
+
+Here, in the project the algorithm terminates in one of the two cases:
+1). Either the CNF formula is found to comprise a consistent set of literals—that
+is, there is no l and ¬l for any literal l in the formula.
+
+2) Otherwise, if the formula contains an empty clause, then clause is 
+false because a disjunction requires at least one member that 
+is true for the overall set to be true.
+
+The pseudocode DPLL function only returns whether the final assignment 
+satisfies the formula or not.
+
+The Davis–Logemann–Loveland algorithm depends on the choice of branching 
+literal, which is the literal considered in the backtracking step.
